@@ -31,7 +31,7 @@ void main(){
 
   vAudio = texture2D( t_audio , vec2( abs( sin(1000. * sin( vUv.x * 100. ) * cos( vUv.y * 1000. ))) , 0. ) );
  
-  gl_PointSize = length( vAudio ) * 1. + 1.;
+  gl_PointSize = length( vAudio ) * 4. + 1.;
   //vec4 pos = texture2D( t_pos , vec2( vUv.x , (1. - (vUv.y + .125)) ) );
   vec4 pos = texture2D( t_pos , vUv );
   /*vec4 v1 = texture2D( t_pos , tri1.xy );
