@@ -90,6 +90,7 @@ function CurlMesh( title , mesh , extraParams ){
     }
   }
 
+  if( extraParams.type ) params.type = extraParams.type;
 
   if( extraParams.vs ) params.vs = extraParams.vs;
   if( extraParams.fs ) params.fs = extraParams.fs;

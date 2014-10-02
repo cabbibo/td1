@@ -117,7 +117,7 @@
       right:0px;
       top:0px;
       z-index:999;
-     // display:none;
+      display:none;
 
     }
     
@@ -334,17 +334,14 @@
     camera = new THREE.PerspectiveCamera( 
       50 ,
       window.innerWidth / window.innerHeight,
-      10,
-      10000
+      .0000000000000000001,
+      20000000000000000
     );
 
     // placing our camera position so it can see everything
     camera.position.z = 2000 ;
     camera.lookAt( new THREE.Vector3() );
 
-    cubeCamera = new THREE.CubeCamera( 20, 100000, 1024 );
-    cubeCamera.renderTarget.minFilter = THREE.LinearMipMapLinearFilter;
-    scene.add( cubeCamera );
 
     // Getting the container in the right location
     container     = document.createElement( 'div' );
@@ -359,16 +356,29 @@
 
 
     // Setting up our Renderer
-    renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer = new THREE.WebGLRenderer({ 
+      alpha: true,
+      preserveDrawingBuffer:true,
+      autoClearColor: false,
+      autoClear: false,
+      autoClearDepth: false,
+      autoClearStencil: false
+    
+    });
 
+    renderer.autoClear = false;
+    renderer.autoClearColor = false;
+    renderer.autoClearDepth = false;
+    renderer.autoClearStencil = false;
     renderer.setSize( window.innerWidth, window.innerHeight );
     container.appendChild( renderer.domElement );
     renderer.domElement.style.background="#FFF";
-    
+
+    renderer.setClearColor (0xffffff, .5);
     controls = new THREE.TrackballControls( camera , renderer.domElement);
 
     controls.minDistance = 1;
-    controls.maxDistance = 3000;
+    controls.maxDistance = 10000;
 
     // Making sure our renderer is always the right size
     window.addEventListener( 'resize', onWindowResize , false );
@@ -382,10 +392,8 @@
 
     //var g = new THREE.Mesh( new THREE.IcosahedronGeometry( 3 , 4 ) );
     gem = new CurlMesh( 'hand' , t , {
-      
       vs: shaders.vertexShaders.basic,
       fs: shaders.fragmentShaders.basic,
-  
       soul:{
 
         noiseSize:{type:"f" , value:.015 , constraints:[ .00001 , .04 ]},
@@ -393,11 +401,8 @@
         
 
       },
-
       body:{
-        custom1:{type:"f" , value:.9 , constraints:[ .8 , 1 ]},
-        custom2:{type:"f" , value:.5 , constraints:[ 0 , 1 ]},
-        custom3:{type:"f" , value:3 , constraints:[ 0 , 5 ]},
+        uColor:{type:"v3" , value: new THREE.Vector3( 0,0,0 ) }
       }
 
     }); 
@@ -406,7 +411,7 @@
     gem.toggle();
 
 
-    for( var i =0; i < 30; i++ ){
+    for( var i =0; i < 5; i++ ){
 
       var m = gem.body.clone();
 
@@ -423,6 +428,28 @@
 
     }
 
+    gem1 = new CurlMesh( 'hand' , t , {
+      vs: shaders.vertexShaders.basic,
+      fs: shaders.fragmentShaders.basic,
+      soul:{
+
+        noiseSize:{type:"f" , value:1.015 , constraints:[ .00001 , .04 ]},
+       
+      },
+
+      body:{
+        uColor:{ type:"v3" , value: new THREE.Vector3( 1 , 51 / 256,  204 / 256 ) }
+      },
+      type:"lines"
+
+    }); 
+
+    gem1.body.scale.multiplyScalar( 2 );
+    gem1.soul.reset( gem1.t_og.value );
+    gem1.toggle();
+
+
+
   }
 
 
@@ -436,16 +463,28 @@
     G_UNIFORMS.time.value += G_UNIFORMS.dT.value;
 
     gem.update();
+    gem1.update();
 
 
-
+   /// gem1.body.scale.x = Math.sin( G_UNIFORMS.time.value );
+   // gem1.body.scale.y = Math.sin( G_UNIFORMS.time.value * .324 );
+   // gem1.body.scale.z = Math.sin( G_UNIFORMS.time.value * 5 );
+    camera.position.x += (Math.random() -.5 )* 20.;
     stats.update();
 
     controls.update();
 
+    //////////////////renderer.clearColor();
 
+    //renderer.clearDepth();
     renderer.render( scene , camera );
+    //renderer.clearColor();
 
+    if( Math.random() < .05 ){
+      
+      renderer.clear();
+      renderer.clearColor();
+    }
     requestAnimationFrame( animate );
 
   }
